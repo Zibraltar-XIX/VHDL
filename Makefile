@@ -17,7 +17,7 @@ compile: sim
 # Règle de simulation (Génération du fichier VCD)
 run: compile
 	@echo "=> Simulation en cours..."
-	ghdl -r --workdir=sim --std=08 $(TESTBENCH) --stop-time=200ns --vcd=sim/wave.vcd
+	ghdl -r --workdir=sim --std=08 $(TESTBENCH) --stop-time=$(TIME) --vcd=sim/wave.vcd
 
 # Règle pour afficher les chronogrammes
 view: run

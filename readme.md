@@ -104,3 +104,15 @@ DUT: entity work.composant
 - `DUT` signifie Device Under Test (le composant que l'on teste).
 - `entity work.dgate` dit au simulateur : "Prends le composant `composant` qu'on a codé tout à l'heure et pose-le ici".
 - `port map(...)` ici on map les broches du composant avec le test bench.
+
+# Explication composant
+## Partie 1
+### Dgate
+La bascule D (D-gate) est une mémoire sur 1 bit. C'est un composant qui copie la valeur de son entrée de donnée (D) vers sa sortie (Q) uniquement au moment précis d'un front montant d'horloge (clk). Le reste du temps, elle ignore les changements sur D et maintient sa sortie stable, agissant ainsi comme une case de stockage d'un bit.
+
+### Mux
+Un MUX est l'équivalent électronique d'un aiguillage. C'est un composant qui possède plusieurs entrées de données mais une seule sortie. Il utilise une entrée supplémentaire appelée "sélecteur" (comme une télécommande) pour choisir laquelle des entrées de données a le droit de traverser pour atteindre la sortie.
+
+## Partie 2
+### Registre à décalage
+Un registre à décalage est une file d'attente de mémoire composée de plusieurs Dgate branchées à la chaîne. À chaque front montant d'horloge, tous les bits mémorisés avancent simultanément d'une case vers la droite, laissant entrer une nouvelle donnée d'un côté et expulsant la donnée la plus ancienne de l'autre côté.
