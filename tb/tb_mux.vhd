@@ -8,7 +8,7 @@ end tb_mux;
 
 -- Comportement du Test bench (simulation humaine)
 architecture sim of tb_mux is
-    signal s_sig : std_logic := '0'; -- Clock à 0 au démmarage
+    signal s_sig : std_logic := '0'; -- Select à 0 au démmarage
     signal a_sig   : std_logic := '0'; -- Entrée a à 0 au démmarage
     signal b_sig   : std_logic := '1'; -- Entrée a à 1 au démmarage
     signal q_sig   : std_logic;
