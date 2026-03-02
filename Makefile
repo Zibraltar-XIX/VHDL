@@ -1,7 +1,3 @@
-# Variable d'execution
-#TESTBENCH ?= tb_dgate
-#SRC_FILE ?= src/dgate.vhd
-
 # Règle principale : tout faire jusqu'à l'affichage
 all: view
 

@@ -12,7 +12,7 @@ entity dgate is
 end dgate;
 
 -- Comportement du composant
-architecture dgate_fonction of dgate is
+architecture arch_dgate of dgate is
 begin
     process(clk) -- Si la clock passe à 1, q prend la valeur de d
     begin
@@ -20,4 +20,4 @@ begin
             q <= d;
         end if;
     end process;
-end dgate_fonction;
+end arch_dgate;
