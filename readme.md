@@ -116,3 +116,12 @@ Un MUX est l'équivalent électronique d'un aiguillage. C'est un composant qui p
 ## Partie 2
 ### Registre à décalage
 Un registre à décalage est une file d'attente de mémoire composée de plusieurs Dgate branchées à la chaîne. À chaque front montant d'horloge, tous les bits mémorisés avancent simultanément d'une case vers la droite, laissant entrer une nouvelle donnée d'un côté et expulsant la donnée la plus ancienne de l'autre côté.
+
+### Registre de stockage
+Un registre de stockage (Buffer) est une mémoire multi-bits (ici 4). Il prend en entrée plusieurs fils simultanément (un vecteur de données) et "photographie" leur état global au moment précis d'un front d'horloge, pour le copier instantanément et le maintenir sur sa sortie jusqu'au prochain signal de l'horloge. C'est une Dgate sur 4 bits.
+
+### Registre de sélection
+Un registre de sélection est un multiplexeur qui marche sur 4 bits. À chaque front d'horloge, il évalue l'état de sa broche de sélection (pour choisir entre l'entrée A et l'entrée B), puis il capture et mémorise de manière synchrone le vecteur de données choisi pour l'afficher sur sa sortie.
+
+### Compteur
+Un compteur est une mémoire qui s'auto-incrémente. À chaque front d'horloge, il lit son état interne, passe à la valeur binaire suivante (ou précédente) de sa séquence, et mémorise ce nouveau nombre sur sa sortie pour comptabiliser les cycles ou les événements écoulés.
