@@ -10,6 +10,7 @@ sudo apt install ghdl gtkwave make
 ````
 
 # Execution du Makefile
+## Général
 **Commande view :** `make view TESTBENCH=nom_testbench SRC_FILE=src/code.vhd`
 
 Ou `nom_testbench` le nom du test bench dans `/tb` (ex: `tb_dgate` pour `tb_dgate.vhd`)
@@ -22,6 +23,36 @@ Et `src/code.vhd` le composant / circuit à tester.
 
 ou `TESTBENCH=nom_testbench` le composant / circuit testé à clean.
 
+## Dgate
+```` bash
+make view TESTBENCH=tb_dgate SRC_FILE=src/dgate.vhd TIME=200ns
+make clean TESTBENCH=tb_dgate
+````
+## Mux
+```` bash
+make view TESTBENCH=tb_mux SRC_FILE=src/mux.vhd TIME=200ns
+make clean TESTBENCH=tb_mux
+````
+## Registre à décalage
+```` bash
+make view TESTBENCH=tb_reg_dec SRC_FILE=src/reg_dec.vhd TIME=120ms
+make clean TESTBENCH=tb_reg_dec
+````
+## Registre de stockage
+```` bash
+make view TESTBENCH=tb_reg_stock SRC_FILE=src/reg_stock.vhd TIME=300ns
+make clean TESTBENCH=tb_reg_stock
+````
+## Registre de sélection
+```` bash
+make view TESTBENCH=tb_reg_sel SRC_FILE=src/reg_sel.vhd TIME=300ns
+make clean TESTBENCH=tb_reg_sel
+````
+## Compteur
+```` bash
+make view TESTBENCH=tb_compteur SRC_FILE=src/compteur.vhd TIME=900ns
+make clean TESTBENCH=tb_compteur
+````
 # Explication VHDL
 ## Circuits et composants
 ```` vhdl
