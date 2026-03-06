@@ -38,9 +38,7 @@ begin
     begin
         if rising_edge(clk) then
             r_right <= d & r_right(3 downto 1);
-        end if;
 
-        if rising_edge(clk) then
             if compte_interne = "11" then
                 load_data <= r_right;
                 compte_interne <= "00"; -- Remise à 0 du compteur quand on atteint 4
@@ -54,7 +52,7 @@ begin
     process(clk)
     begin
         if rising_edge(clk) then
-            if s <= '0' then
+            if s = '0' then
                 sub_bit3 <= not sub_bit2(0);
                 sub_bit2 <= sub_bit1;
                 sub_bit1 <= output;
