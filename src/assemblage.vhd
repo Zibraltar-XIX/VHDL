@@ -1,6 +1,3 @@
--- !!! FICHIER NON COMPLET !!!
--- !!! FICHIER NON VERIFIE !!!
-
 -- Importation des librairies
 library ieee;
 use ieee.std_logic_1164.all;
@@ -9,100 +6,129 @@ use ieee.numeric_std.all;
 -- Définition du composant (assemblage)
 entity assemblage is
     port (
-        clk : in  std_logic; -- Entrée de l'horloge
-        s   : in  std_logic; -- Select pour bouclage ou non
-        d   : in std_logic;  -- Entrée de données
-        k   : in std_logic_vector(3 downto 0); -- Clé de chiffrement
-        q   : out std_logic_vector(3 downto 0)  -- Sortie (la donnée mémorisée)
+        clk : in  std_logic;                    -- Horloge
+        d   : in  std_logic;                    -- Entrée des données
+        k   : in  std_logic_vector(3 downto 0); -- Clé de chiffrement
+        q   : out std_logic_vector(3 downto 0)  -- Sortie
     );
 end assemblage;
 
--- Comportement du composant
+-- Architecture du composant
 architecture arch_assemblage of assemblage is
-    signal compte_interne : unsigned(1 downto 0) := "00";
-    signal r_right : std_logic_vector(3 downto 0) := "0000";
-    signal load_data : std_logic_vector(3 downto 0) := "0000";
-    signal sub_bit1 : std_logic_vector(3 downto 0) := "0000";
-    signal sub_bit2 : std_logic_vector(3 downto 0) := "0000";
-    signal sub_bit3 : std_logic := '0';
-    signal row_shift1 : std_logic_vector(3 downto 0) := "0000";
-    signal row_shift2 : std_logic_vector(3 downto 0) := "0000";
-    signal flip_bit1 : std_logic_vector(3 downto 0) := "0000";
-    signal flip_bit2 : std_logic_vector(3 downto 0) := "0000";
-    signal output : std_logic_vector(3 downto 0) := "0000";
+
+    component r_right is
+        port (
+            clk : in  std_logic;
+            d   : in  std_logic;
+            q   : out std_logic_vector(3 downto 0)
+        );
+    end component;
+
+    component buff is
+        port (
+            clk : in  std_logic;
+            d   : in  std_logic_vector(3 downto 0);
+            q   : out std_logic_vector(3 downto 0)
+        );
+    end component;
+
+    component r_sel is
+        port (
+            a   : in  std_logic_vector(3 downto 0);
+            b   : in  std_logic_vector(3 downto 0);
+            s   : in  std_logic;
+            q   : out std_logic_vector(3 downto 0)
+        );
+    end component;
+
+    component cpt is
+        port (
+            clk : in  std_logic;
+            q   : out std_logic_vector(4 downto 0)
+        );
+    end component;
+
+    -- Signaux internes
+    signal clk_div4       : std_logic := '0';
+    signal clk_div_cnt    : unsigned(1 downto 0) := "00";
+    signal cpt_out        : std_logic_vector(4 downto 0);
+    signal sel_auto       : std_logic;
+    signal load_data_out  : std_logic_vector(3 downto 0);
+    signal sel_out        : std_logic_vector(3 downto 0);
+    signal sub_bit_comb   : std_logic_vector(3 downto 0);
+    signal sub_bit_s1     : std_logic_vector(3 downto 0);
+    signal sub_bit_s2     : std_logic_vector(3 downto 0);
+    signal row_shift_comb : std_logic_vector(3 downto 0);
+    signal row_shift_s1   : std_logic_vector(3 downto 0);
+    signal row_shift_s2   : std_logic_vector(3 downto 0);
+    signal flip_bit_comb  : std_logic_vector(3 downto 0);
+    signal flip_bit_s1    : std_logic_vector(3 downto 0);
+    signal flip_bit_s2    : std_logic_vector(3 downto 0);
+    signal mix_key_comb   : std_logic_vector(3 downto 0);
+    signal mix_key_out    : std_logic_vector(3 downto 0);
 
 begin
-
-    -- Load data
     process(clk)
     begin
         if rising_edge(clk) then
-            r_right <= d & r_right(3 downto 1);
-
-            if compte_interne = "11" then
-                load_data <= r_right;
-                compte_interne <= "00"; -- Remise à 0 du compteur quand on atteint 4
+            if clk_div_cnt = "11" then
+                clk_div4 <= not clk_div4;
+                clk_div_cnt <= "00";
             else
-                compte_interne <= compte_interne + 1;
+                clk_div_cnt <= clk_div_cnt + 1;
             end if;
         end if;
     end process;
 
-    -- Sub Bits
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if s = '0' then
-                sub_bit3 <= not sub_bit2(0);
-                sub_bit2 <= sub_bit1;
-                sub_bit1 <= output;
-            end if;
+    cpt_inst : cpt
+        port map (clk => clk_div4, q   => cpt_out);
 
-            if s <= '1' then
-                sub_bit3 <= not sub_bit2(0);
-                sub_bit2 <= sub_bit1;
-                sub_bit1 <= load_data;
-            end if;
-        end if;
-    end process;
+    sel_auto <= '1' when unsigned(cpt_out) < 4 else '0';
 
-    -- Row Shift
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            -- Le row shift 2 prend la valeur du row shift 1 avec un décalage de 1bit
-            row_shift2(0) <= row_shift1(3);
-            row_shift2(1) <= row_shift1(0);
-            row_shift2(2) <= row_shift1(1);
-            row_shift2(3) <= row_shift1(2);
+    load_data_inst : r_right
+        port map (clk => clk, d   => d, q   => load_data_out);
 
-            row_shift1 <= sub_bit2;
-            row_shift1(0) <= sub_bit3;
-        end if;
-    end process;
+    sel_inst : r_sel
+        port map (a   => mix_key_out, b   => load_data_out, s   => sel_auto, q   => sel_out);
 
-    -- Flib bit
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            flip_bit1 <= row_shift2;
-            flip_bit2(0) <= flip_bit1(0);
-            flip_bit2(1) <= flip_bit1(3);
-            flip_bit2(2) <= flip_bit1(2);
-            flip_bit2(3) <= flip_bit1(1);
-        end if;
-    end process;
+    sub_bit_buff1 : buff
+        port map (clk => clk_div4, d   => sel_out, q   => sub_bit_s1);
 
-    -- Mix Key
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            output(3) <= flip_bit2(3) xor k(3);
-            output(2) <= flip_bit2(2) xor k(2);
-            output(1) <= flip_bit2(1) xor k(1);
-            output(0) <= flip_bit2(0) xor k(0);
-        end if;
-    end process;
+    sub_bit_comb(3) <= sub_bit_s1(3);
+    sub_bit_comb(2) <= sub_bit_s1(2);
+    sub_bit_comb(1) <= sub_bit_s1(1);
+    sub_bit_comb(0) <= not sub_bit_s1(0);
 
-    q <= output; -- Assignation de la sortie
+    sub_bit_buff2 : buff
+        port map (clk => clk_div4, d   => sub_bit_comb, q   => sub_bit_s2);
+
+    row_shift_buff1 : buff
+        port map (clk => clk_div4, d   => sub_bit_s2, q   => row_shift_s1);
+
+    row_shift_comb(0) <= row_shift_s1(1);
+    row_shift_comb(1) <= row_shift_s1(2);
+    row_shift_comb(2) <= row_shift_s1(3);
+    row_shift_comb(3) <= row_shift_s1(0);
+
+    row_shift_buff2 : buff
+        port map (clk => clk_div4, d   => row_shift_comb, q   => row_shift_s2);
+
+    flip_bit_buff1 : buff
+        port map (clk => clk_div4, d   => row_shift_s2, q   => flip_bit_s1);
+
+    flip_bit_comb(0) <= flip_bit_s1(0);
+    flip_bit_comb(1) <= flip_bit_s1(3);
+    flip_bit_comb(2) <= flip_bit_s1(2);
+    flip_bit_comb(3) <= flip_bit_s1(1);
+
+    flip_bit_buff2 : buff
+        port map (clk => clk_div4, d   => flip_bit_comb, q   => flip_bit_s2);
+
+    mix_key_comb <= flip_bit_s2 xor k;
+
+    mix_key_buff : buff
+        port map (clk => clk_div4, d   => mix_key_comb, q   => mix_key_out);
+
+    q <= mix_key_out;
+
 end arch_assemblage;
