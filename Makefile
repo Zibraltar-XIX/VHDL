@@ -7,8 +7,14 @@ sim:
 
 # Règle de compilation (Analyse et Elaboration)
 compile: sim
-	@echo "=> Compilation de $(SRC_FILE)..."
-	ghdl -a --workdir=sim --std=08 $(SRC_FILE)
+	@echo "=> Compilation des composants..."
+	ghdl -a --workdir=sim --std=08 src/dgate.vhd
+	ghdl -a --workdir=sim --std=08 src/mux.vhd
+	ghdl -a --workdir=sim --std=08 src/buff.vhd
+	ghdl -a --workdir=sim --std=08 src/r_right.vhd
+	ghdl -a --workdir=sim --std=08 src/r_sel.vhd
+	ghdl -a --workdir=sim --std=08 src/cpt.vhd
+	ghdl -a --workdir=sim --std=08 src/assemblage.vhd
 	@echo "=> Compilation de tb/$(TESTBENCH).vhd..."
 	ghdl -a --workdir=sim --std=08 tb/$(TESTBENCH).vhd
 	@echo "=> Elaboration de $(TESTBENCH)..."

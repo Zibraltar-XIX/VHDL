@@ -52,7 +52,7 @@ architecture arch_assemblage of assemblage is
     signal clk_div4       : std_logic := '0';
     signal clk_div_cnt    : unsigned(1 downto 0) := "00";
     signal cpt_out        : std_logic_vector(4 downto 0);
-    signal sel_auto       : std_logic;
+    signal sel_auto       : std_logic := '1';
     signal load_data_out  : std_logic_vector(3 downto 0);
     signal sel_out        : std_logic_vector(3 downto 0);
     signal sub_bit_comb   : std_logic_vector(3 downto 0);
@@ -83,7 +83,16 @@ begin
     cpt_inst : cpt
         port map (clk => clk_div4, q   => cpt_out);
 
-    sel_auto <= '1' when unsigned(cpt_out) < 4 else '0';
+    process(clk_div4)
+    begin
+        if rising_edge(clk_div4) then
+            if unsigned(cpt_out) < 4 then
+                sel_auto <= '1';
+            else
+                sel_auto <= '0';
+            end if;
+        end if;
+    end process;
 
     load_data_inst : r_right
         port map (clk => clk, d   => d, q   => load_data_out);
@@ -125,6 +134,7 @@ begin
         port map (clk => clk_div4, d   => flip_bit_comb, q   => flip_bit_s2);
 
     mix_key_comb <= flip_bit_s2 xor k;
+
 
     mix_key_buff : buff
         port map (clk => clk_div4, d   => mix_key_comb, q   => mix_key_out);
