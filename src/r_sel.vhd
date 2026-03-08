@@ -15,7 +15,7 @@ end r_sel;
 -- Comportement du composant
 architecture arch_r_sel of r_sel is
 begin
-    process(s) -- Si le select passe à 1 et la clock est à 1, q prend la valeur de b. Sinon, q prend la valeur de a.
+    process(s, a, b) -- Combinatoire : q = b si s='1', sinon q = a
     begin
         if s = '1' then
             q <= b;
